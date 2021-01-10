@@ -1,0 +1,212 @@
+(0/0/20) (V1.0.0 release)
+- Added several global defines that define the start and end of the 2 RAM banks, the 8 KB mirror, and the SRAM/BW-RAM banks. Useful for RAM clear loops that use a general RAM address and not a specific one. The SRAM end one will adjust based on what SRAM/BW-RAM size and memory map is being used.
+- Shortened the name of the !Joypad defines a little.
+- Removed the old !Button defines and replaced them with the new !Joypad defines in all the games.
+- Added the ability to set the byte that a FREE_BYTES macro will insert and the address it's supposed to be inserted at similar to a routine macro.
+- Added SRAM map files. This includess all the SRAM defines being moved to them and adding defines that let one use a custom SRAM map.
+- Renamed !Define_Global_GenerateHackedROM to !Define_Global_ApplyAsarPatches.
+- It's no longer necessary to set !Define_Global_GenerateHackedROM to be able to link to custom files.
+- Changed how ROM compilation works. You now have to type the GameID of the ROM you want to insert when running the .bat file.
+- Replaced !UseExtendedHeader with !Define_Global_CartridgeHeaderVersion and added support for all 3 known cartridge header versions.
+- The Licensee ID is now handled separately from the displayed name when assembling. The licensee name that gets displayed during assembly is now handled with a new define defined inside the ROM Map file.
+- The output file's name will now change based on which ROM version is assembled. For example, assembling SMAS_U will give "Super Mario All-Stars (U)", assembling SMASW_E will give "Super Mario All-Stars + Super Mario World (E)", etc.
+- The filename is now displayed instead of the GameID when assembling the ROM.
+- Added disassembly framework version number defines, which will display the version of the framework during assembly. The disassembly framework version number is now displayed when assembling.
+- Added support for 1.5 and 3.5 MB ROMs to the framework.
+- The Misc. defines and macro file is now accessible when assembling an SPC700 related file.
+- Added a small hack that will correct the checksum on unedited ROMs where asar doesn't output the same checksum as the original ROM. This applies only if !Define_Global_FixIncorrectChecksumHack is !TRUE and the output checksum matches with the one set by !Define_Global_AsarChecksum
+- Made it so that asar will display leading zeros for checksums less than $1000.
+- Added a new step to ROM compilation, specifically for checking the checksum and correcting it if the above mentioned hack is enabled.
+- The checksum compliment can now be set independant of the checksum, specifically for ROMs where it was set wrong.
+- Updated the GAMEX base ROM to include some functionality to aid with homebrew development, such as a general purpose V-Blank routine, a fade in/out function, initializing RAM and hardware registers, etc.
+- Added a define !ContextDependentTable, which is meant for when a game directly indexes a table, but the table's address is highly variable. ie. LDA.w $0000,x, when the code is indexing ROM
+- Added support for both versions of the DSP-1 chip. Technically, there are three versions, but DSP-1 and DSP-1A are identical codewise.
+- Global macro ROMSettingWarningsAndErrors() has been renamed to PrintHeaderInformation(), and the various warning messages originally inside it have been moved to a new macro, DisplaySettingMessages(), which will display these warnings and the end of ROM assembly where they're better able to be seen. 
+- Added new step to ROM compilation, specifically for copying firmware files into the disassembly folder when the current ROM is set to use a chip that requires it. Note that these firmware files are not provided by the disassembly and you must find them yourself! If you don't, asar will warn you if you attempt to use these chips.
+- Added a check for if the bank parameter in the BANK_START() macro is greater than the max bank allowed by the ROM size or if it's greater than $FF.
+- Added a warning if the ROM size is set to 32 KB and the memory map is set to one of the HiROM settings.
+- Added in the DSP-1 defines to its hardware register file.
+- Added ROMBANKXX_START/ROMBANKXX_END labels that auto generate for each BANK_START()/BANK_END() macro respecitively.
+- Added a new global macro, HiROMBankSplit() that enables splitting a HiROM bank into two parts when using a HiROM memory map.
+- Moved the bank defines from the Global_Definitions file to the memory map files, and adjusted them for each memory map. This fixes various checks in the BANK_START/END macros that previously didn't work and also allows the actual bank number to display when showing how much was inserted into each bank.
+- Fixed a bug where asar would incorrectly insert a checksum at $C07FDC if assembling a HiROM game.
+- Added partial support for the SuperFX memory map.
+- Added a new global macro called InsertGarbageData(), which is used to insert blocks of garabge code/data from a disassembly's GarbageData folder. Blocks handled with this macro will be removed if !Define_Global_IgnoreOriginalFreespace is set to !TRUE. You can also set the address it inserts at like a routine macro.
+- Added defines for the remaining SNES registers that needed them in the SNES hardware register file.
+- Added partial support for the Super Gameboy and Satellaview.
+- Added partial support for all of the more exotic controllers and related accessories.
+- Removed the Assembly_Settings files and moved all their settings to the ROM Map files.
+- Added defines to the ROM Map file for displaying the developer name, release date and MD5 Hash of the ROM that was used to make the disassembly.
+- Added an optional compilation step to generate a save file
+- Re-enabled the freespace leak warning for the Finalize ROM step of compilation.
+- Disabled the warning about 16-bit parameters for some opcodes during SPC700 compilation. This is so labels can be used with these opcodes.
+- Added a global macro called EnableSuperFXHiROMMirroring() that designates a bank as a HiROM bank when using the SuperFX memory map.
+- Added some additional error checks regarding certain setting combinations, such as using certain chips without their respective memory map or using the SuperFX chip in conjunction with non-standard controllers.
+- Added support for custom ROM Map files without the need for changing the base disassembly.
+- Rewrote the readme entirely to be far more informative and up to date with all the new changes to the framework.
+- Fixed a small bug where the ! after the "Done" that's displayed after ROM assembly has finished would not display.
+- Reworked how SNES_Header() works it now accepts a 24-bit address as its parameter and it can now be used as many times as one wants. In addition, placing it overrides the automatic header insertion function.
+
+;--------------------------------------------------------------------
+
+(7/3/20)
+- Added the ability to set which controllers are used by the game being assembled.
+- Moved all the Memory Map files in the global folder to a subfolder.
+- Changed how the cartridge header defines are loaded so that they are now loaded from the ROM Map file instead of the Assemble_Settings.asm file.
+- Cleaned up the Assembly Setting files to remove the now redundant header defines.
+- Removed the StoreHackedROMHeaderDefines() global macro as it's no longer needed.
+
+;--------------------------------------------------------------------
+
+(1/3/20)
+- Added a new disassembly for "GAMEX", which can serve as a base for creating your own disassemblies and/or for homebrew development.
+- Removed the various Custom_X_Game.asm files from the custom folders, as you can get the necesssary base files from the GAMEX folder.
+- Corrected the spelling of assembly on the AssemblySetting files.
+- Removed the Main_X.asm files, as I standardized all the games to use AssembleROM.asm as the base file.
+- Removed the various unknown SPC data files from the various folders.
+- Renamed the BASE_START/BASE_END global macros to SPCDataBlockStart/SPCDataBlockEnd and added some error checking to them.
+- Added a new global macro called EndSPCUploadAndJumpToEngine that is used to mark an "end point" for SPC file uploads.
+- Created defines for the SPC700/DSP, MSU-1, and S-RTC registers.
+- Moved the hardware register defines to separate files so only the needed ones get loaded. The SNES/SPC700 ones are always loaded depending on what is being assembled.
+- Added a new custom chip define that controls what custom chips are being used.
+- Added partial support for the DSP-2, DSP-3, DSP-4, Cx4, S-RTC, S-DD1, SPC7110, ST010, ST011, and ST018. None of these have defines created for them.
+- Added a 1 to the end of the !Chip_DSP define to avoid confusion with the DSP chip the SPC700 interacts with and the other DSP-X chips.
+- Moved a lot of the fixed defines from Assembly_Settings_X.asm to Global_Definitions.asm. This was done to make it easier to add new defines when needed in order to reduce the number of files that need to be updated.
+- Added support for the expanded cartridge header at $00FFB0.
+- Added the ability to set it so that both the custom and the original RAM Map, Routine Macros, Macros, and Misc Defines file can be loaded.
+- Standardized the RAM label defines to be !RAMType_Game_Tag_Name where "Tag" now indicates where the RAM address is used as opposed to its function. The function has been moved to the "Name" portion. However, this doesn't apply to SMAS and SMW as of yet.
+
+;--------------------------------------------------------------------
+
+(7/5/19)
+- Modified the behavior of the SNES_Header to allow multiple to be inserted based on the mapper.
+- Disabled warning W1019 to allow one to place manual RATS tags in the disassembly without asar nagging about how you should put @xkas somewhere.
+- Wrote a couple macros for inserting RATS tags and added a toggle to disable these RATS tags from being inserted.
+- Made the PrintLabelLocation display the ROM version.
+- Reworked how the routine position hardcoding works, so instead of 2-7 defines being stored in every routine macro, the ROM address is stored in a macro parameter.
+- Made it so that each version of each game has its own separate ROM Map file.
+- Moved the game specific bank macros to the respective Routine Macros file.
+- Added a new setting, !Define_Global_IgnoreOriginalFreespace, that lets one toggle whether the original game's freespace is inserted.
+- Made asar display the state of the various !Define_Global_UseCustomX defines when generating a hacked ROM.
+
+;--------------------------------------------------------------------
+
+(1/8/19)
+- Made it so that the SRAM will automatically remap itself based on the memory map.
+- Added support for 256 KB of SRAM/BW-RAM.
+- Added support for 2.5 MB ROMs, since that's the size SMAS+W is.
+- Made asar display information about the current SNES header settings.
+- Rewrote the bank handling system to fix the memory mapping for HiROM and SA-1 (though ExLoROM/ExHiROM don't work yet). In addition, setting the ROM size greater than 4 MB and the mapper to SA-1 will now make asar use fullsa1rom addressing.
+- Added a bunch of error checks when setting the banks to reduce the chances of overwriting data that's already been inserted. Banks must now also be inserted in ascending order.
+- Enabled the ability to use a custom version of ROM_Map_X.asm, RAM_Map_X.asm, Macros_X.asm, Routine_Macros_X.asm, and Misc_Defines_X.asm. You may also specify the path to the file so asar will know where to look.
+- Added in some defines for various hardware registers
+- Updated the readme because it was pretty out of date.
+- Updated the included asar version to 1.71.
+- Cleaned up the InitializeROMSettings macro to be more general purpose. The SMW/SMAS specific stuff has been offsourced to a game specific version of these macros.
+- Moved the ROM setting stuff from Global_Definitions.asm to game specific AssemblySettings_X.asm files. This also means that one can have different settings between SMW and SMAS.
+- Made it possible to easily change the unused Native/Emulation mode vectors in the cartridge header, just in case some chip happened to use them or the user wants to make use of these 8 bytes.
+- When inserting a block of data that spans multiple banks, asar will now print out both the amount of bytes inserted and the bank range they were inserted at.
+- Updated this changelog to divide it up into sections specific to each game and a general section for global changes. I also corrected the entry for (4/19/18) because I accidentally used the changelog for (4/16/19).
+- Moved a couple files to a new Global folder to reduce clutter.
+- Other miscellaneous changes.
+
+;--------------------------------------------------------------------
+
+(1/4/19)
+- Added some SA-1 register defines to Global_Definitions.asm
+- Updated the included asar version to 1.70 (released today!), which sped up compilation time by 12 seconds.
+- Removed the GetRemainders and GetCorrectIncbinOffsets macros because they're now redundant due to the above change.
+- Other minor tweaks.
+
+;--------------------------------------------------------------------
+
+(10/23/18)
+- Added a warnpc check in SNES_Header so that an error is thrown if bank 00's contents go past $00FFC0/$80FFC0.
+- Disabled the freespace leak warning (W1011) since the entire ROM is assembled at once, so freespace leaks can't occur.
+- Added a register define for $213F, since I forgot to make one.
+- Changed all the RAM defines from $0000-$1FFF to be for bank 00 instead of 7E, as that's how they're referenced when using long addressing. Also removed the comments mentioning this.
+- Modified the BANK_START macro so that it works differently based on the memory map setting and the current bank.
+- The !GameID define is now passed to asar through the command line, making it possible to assemble the ROM differently depending on which game the ROM is supposed to be.
+- !Define_ROMToAssemble has been split into two defines, one for SMW when being assembled by itself and one for SMAS+W.
+
+;--------------------------------------------------------------------
+
+(10/1/18)
+- Created a makefile for assembling the ROM.
+- Removed the InsertSharedCodeOrDataMacros macro, since I created a better system for handling shared macros.
+
+;--------------------------------------------------------------------
+
+(9/13/18)
+- Implemented the unused controller defines into the disassembly.
+- Switched the order of the entries in the changelog so that the most recent version is first.
+- Added the ability to set the ROM size to 128 KB, 64 KB, and 32 KB. Those aren't official SNES ROM sizes, but I don't see a reason why they wouldn't work.
+- Added defines for each of the vectors located in the SNES header. This will make it easier to quickly change these.
+- Created a macro for inserting patches after the ROM is assembled. This one is meant for patches that haven't been integrated into the disassembly or ones that don't work during ROM assembly (ex. Ones that use the readX commands).
+- Made it so that each game's folder has its own asar_patches.asm and Patches folder.
+- Moved all the WRAM/VRAM/CGRAM/SRAM defines and structs to a separate file.
+- Many other small changes.
+
+;--------------------------------------------------------------------
+
+(8/20/18)
+- Rearranged the folder structure of the disassembly to make this into a possible SMAS+W disassembly.
+- Split up some files so that certain defines/macros can be shared among the other games in SMAS+W
+- Added a batch script folder that will include useful batch scripts. The only one included so far is one that will give you the X/Y position of a stripe image for use with the StripeImageHeader macro.
+- Added the ability to change the Licensee in the cartridge header.
+- Changed the file extension of the assembled ROM to .sfc, so asar will assemble the ROM without the copier header.
+- Fixed a bug where assembling the ROM as 4 MB would cause asar to throw an error.
+- Added this changelog to the disassembly.
+- Made it possible to easily change the asar executable to use when running Assemble_SMW.bat
+- Made a slight change to the included asar 1.60 that prevents asar from automatically using FastROM addressing when using lorom addressing.
+- Many other small changes.
+
+;--------------------------------------------------------------------
+
+(7/28/18)
+- Updated the included asar version to the released version of 1.60.
+- Added a macro that tells you the SNES address that a given label is located at. To use, place these macros at the end of main.asm and put the label name inside the parenthesis.
+- Created a Custom folder inside the GFX folder. This is where you should put custom graphics data if you're planning on using this disassembly to make your hack.
+- Removed the compression.bat from the non-Custom folders.
+
+- Moved the debug defines to be inside Asar_Patches.asm.
+- Created defines for every single sprite property that can be modified with Tweaker.
+- Various other changes.
+
+;--------------------------------------------------------------------
+
+(7/5/18)
+- Added a readme.
+- Updated the included asar version to the latest 1.60 beta.
+- Various small changes.
+
+;--------------------------------------------------------------------
+
+(6/19/18)
+- Added an extra step to ROM compilation that shows the checksum of the generated ROM. In addition, if generating a non-custom ROM, asar will also display the original checksum as a comparison.
+- Various other small changes.
+
+;--------------------------------------------------------------------
+
+(6/2/18)
+- Added more defines for the cartridge header based on what the SNES Dev manual  specifies.
+- Added an extra step to the ROM compilation that generates a blank ROM based on the size you selected it to be in the cartridge header. This is so that patches that use freespace will work correctly.
+- Various small changes.
+
+;--------------------------------------------------------------------
+
+(4/24/18)
+- Hardcoded SNES_Header to be inserted at $00FFC0, since moving that is a bad idea.
+- Added a define that tells asar to ignore the org/warnpc statements in the InsertRoutine/InsertData macros and the FREE_BYTES macros. This is for advanced users who don't care about keeping SMW compatible with various tools.
+- Code/data placed in banks $10-$7D/$80-$FF will now automatically get a RATS tag. You can turn this behavior off if desired.
+- Other small, miscellaneous changes.
+
+;--------------------------------------------------------------------
+
+(4/7/18)
+- Updated the included asar to the newest version.
+
+;--------------------------------------------------------------------
+
+(4/6/18)
+- Initial release
