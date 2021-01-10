@@ -1,0 +1,1 @@
+!BWRAM_SMRPG_Global_SpriteGraphicsBuffer = $004000+!SRAMBankBaseAddress

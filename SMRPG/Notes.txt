@@ -1,0 +1,3 @@
+- This game has quite a bit of evidence to suggest that all banks weren't compiled all at once. That's likely why the game reads fixed ROM addresses to get pointers to things in the same bank.
+
+- Aside from the time I ported my own hack, Yoshi's Strange Quest, to use the SMW disassembly as its base, this is the largest game I've disassembled.
